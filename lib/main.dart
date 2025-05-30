@@ -3,11 +3,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-// --- Assuming splash_screen.dart exists and is defined elsewhere ---
-// For this example, I'll create a minimal placeholder for SplashScreen
-// if you don't provide its content.
-// If you have a splash_screen.dart, make sure it's correctly imported.
-
 // Placeholder SplashScreen (replace with your actual SplashScreen code if different)
 class SplashScreen extends StatefulWidget {
   @override
@@ -23,7 +18,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   _navigateToHome() async {
     await Future.delayed(Duration(milliseconds: 2500), () {}); // Simulate loading
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyApp()));
+    if (mounted) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => MyApp()));
+    }
   }
 
   @override
@@ -50,17 +48,14 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 // --- End Placeholder SplashScreen ---
 
-
 // --- New Color Palette ---
 const Color colorBackground = Color(0xFF201E43);
-const Color colorSurface = Color(0xFF134B70);     // For cards
-const Color colorPrimary = Color(0xFF508C9B);     // Accent/interactive elements
+const Color colorSurface = Color(0xFF134B70); // For cards
+const Color colorPrimary = Color(0xFF508C9B); // Accent/interactive elements
 const Color colorOnSurfaceAndBackground = Color(0xFFEEEEEE); // Text color
 // --- End New Color Palette ---
 
-
 void main() {
-  // runApp(MyApp());
   runApp(SplashScreenApp()); // NEW: Run the SplashScreenApp first
 }
 
@@ -113,18 +108,18 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         fontFamily: 'Poppins',
         colorScheme: ColorScheme(
-          brightness: Brightness.dark,
-          primary: colorPrimary,
-          onPrimary: colorBackground, // Text on primary buttons (e.g., if solid)
-          secondary: colorPrimary.withAlpha(200), // Can be another accent
-          onSecondary: colorBackground,
-          error: Colors.red.shade300,
-          onError: Colors.black,
-          surface: colorSurface,         // Card backgrounds, Dialogs
-          onSurface: colorOnSurfaceAndBackground,      // Text on Cards
-          background: colorBackground,    // Scaffold Background
-          onBackground: colorOnSurfaceAndBackground // Text directly on Background
-        ),
+            brightness: Brightness.dark,
+            primary: colorPrimary,
+            onPrimary: colorBackground, // Text on primary buttons (e.g., if solid)
+            secondary: colorPrimary.withAlpha(200), // Can be another accent
+            onSecondary: colorBackground,
+            error: Colors.red.shade300,
+            onError: Colors.black,
+            surface: colorSurface, // Card backgrounds, Dialogs
+            onSurface: colorOnSurfaceAndBackground, // Text on Cards
+            background: colorBackground, // Scaffold Background
+            onBackground: colorOnSurfaceAndBackground // Text directly on Background
+            ),
         scaffoldBackgroundColor: colorBackground, // Ensures match
         appBarTheme: AppBarTheme(
           backgroundColor: colorBackground.withAlpha(240), // Slightly transparent or solid
@@ -137,7 +132,8 @@ class MyApp extends StatelessWidget {
           ),
           iconTheme: IconThemeData(color: colorOnSurfaceAndBackground.withAlpha(245)),
         ),
-        cardTheme: CardTheme(
+        // FIXED: Changed CardTheme to CardThemeData
+        cardTheme: CardThemeData(
           elevation: 4,
           color: colorSurface, // Explicitly use surface color for cards
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -178,8 +174,8 @@ class _MyHomePageState extends State<MyHomePage> {
       isComingSoon: true,
     ),
     LinkItem(
-      text: 'เว็บคนกลาง',
-      description: 'แพลตฟอร์มซื้อขาย ปลอดภัย ไร้กังวล (เร็วๆ นี้)',
+      text: 'เว็บเช็คคนโกง',
+      description: 'ตรวจสอบประวัติพฤติกรรมโกง (เร็วๆ นี้)',
       url: '#', // Placeholder URL
       icon: FontAwesomeIcons.shieldHalved, // More relevant icon
       brandColor: Colors.lightGreen.shade400,
@@ -237,15 +233,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _launchURL(String urlString, BuildContext context) async {
     if (urlString == '#') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'ลิงก์นี้ยังไม่พร้อมใช้งาน (This link is not yet available)',
-            style: TextStyle(color: colorOnSurfaceAndBackground),
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'ลิงก์นี้ยังไม่พร้อมใช้งาน (This link is not yet available)',
+              style: TextStyle(color: colorOnSurfaceAndBackground),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.surface.withAlpha(200),
           ),
-          backgroundColor: Theme.of(context).colorScheme.surface.withAlpha(200),
-        ),
-      );
+        );
+      }
       return;
     }
     final Uri url = Uri.parse(urlString);
@@ -299,9 +297,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () => _launchURL(item.url, context),
                 isEmphasized: true,
               )
-              .animate()
-              .fadeIn(duration: 400.ms, delay: (100 * index).ms)
-              .slideX(begin: 0.2, end: 0, duration: 600.ms, curve: Curves.elasticOut),
+                  .animate()
+                  .fadeIn(duration: 400.ms, delay: (100 * index).ms)
+                  .slideX(begin: 0.2, end: 0, duration: 600.ms, curve: Curves.elasticOut),
             ),
           );
         },
@@ -330,9 +328,9 @@ class _MyHomePageState extends State<MyHomePage> {
           item: item,
           onTap: () => _launchURL(item.url, context),
         )
-        .animate()
-        .fadeIn(duration: 500.ms, delay: baseDelay + (100 * index).ms)
-        .slideY(begin: 0.2, end: 0, duration: 400.ms, curve: Curves.easeOutCubic);
+            .animate()
+            .fadeIn(duration: 500.ms, delay: baseDelay + (100 * index).ms)
+            .slideY(begin: 0.2, end: 0, duration: 400.ms, curve: Curves.easeOutCubic);
       },
     );
   }
@@ -350,7 +348,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // Total delay before "About Me" starts = delay from "Coming Soon" + initial delay for "Features" + animation duration of "Features" items
     final Duration aboutMeBaseDelay = comingSoonAnimationDuration + baseDelayOffsetForFeatures + featuresAnimationDuration;
 
-
     return GridView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
@@ -367,13 +364,12 @@ class _MyHomePageState extends State<MyHomePage> {
           item: item,
           onTap: () => _launchURL(item.url, context),
         )
-        .animate()
-        .fadeIn(duration: 500.ms, delay: aboutMeBaseDelay + (100 * index).ms)
-        .slideY(begin: 0.2, end: 0, duration: 400.ms, curve: Curves.easeOutCubic);
+            .animate()
+            .fadeIn(duration: 500.ms, delay: aboutMeBaseDelay + (100 * index).ms)
+            .slideY(begin: 0.2, end: 0, duration: 400.ms, curve: Curves.easeOutCubic);
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -397,13 +393,11 @@ class _MyHomePageState extends State<MyHomePage> {
             _buildComingSoonSection(context, mainPadding),
             SizedBox(height: mainPadding * 0.8),
           ],
-
           if (_featureItems.isNotEmpty) ...[
             _buildSectionHeader(context, "🚀 ฟีเจอร์หลัก (Features)"),
             _buildFeatureGridSection(context, mainPadding),
             SizedBox(height: mainPadding * 0.8),
           ],
-          
           if (_aboutMeLinks.isNotEmpty) ...[
             _buildSectionHeader(context, "💡 เกี่ยวกับเรา (About Me)"),
             _buildAboutMeGridSection(context, mainPadding),
@@ -411,20 +405,18 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ],
       )
-    .animate()
-    .fadeIn(duration: 500.ms, delay: 100.ms)
-    .slideY(
-        begin: 0.2,
-        end: 0.0,
-        curve: Curves.elasticOut,
-        duration: 800.ms
-    )
-    .scaleXY(begin: 0.95, end: 1.0, curve: Curves.easeOutCubic, duration: 600.ms),
+          .animate()
+          .fadeIn(duration: 500.ms, delay: 100.ms)
+          .slideY(
+            begin: 0.2,
+            end: 0.0,
+            curve: Curves.elasticOut,
+            duration: 800.ms)
+          .scaleXY(begin: 0.95, end: 1.0, curve: Curves.easeOutCubic, duration: 600.ms),
     );
   }
 }
 // --- End UPDATED _MyHomePageState Class ---
-
 
 class GridItemCard extends StatelessWidget {
   final LinkItem item;
@@ -458,99 +450,100 @@ class GridItemCard extends StatelessWidget {
     final double descriptionFontSize = (isEmphasized ? baseDescEmphasized : baseDescNormal) * textScaleFactor;
 
     Widget cardContent = Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: iconContainerSize,
-                height: iconContainerSize,
-                decoration: BoxDecoration(
-                  color: item.brandColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(50),
-                      blurRadius: isEmphasized ? 8 : 5,
-                      offset: Offset(0, isEmphasized ? 4 : 2),
-                    )
-                  ],
-                ),
-                child: Center(
-                  child: FaIcon(
-                    item.icon,
-                    size: iconSize,
-                    color: item.iconForegroundColor,
-                  ),
-                ),
-              ),
-              SizedBox(height: cardPadding * (isEmphasized ? 0.8 : 0.6)),
-              Text(
-                item.text,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: titleFontSize,
-                  color: theme.colorScheme.onSurface,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (item.description != null && item.description!.isNotEmpty) ...[
-                SizedBox(height: cardPadding * 0.4),
-                Text(
-                  item.description!,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: descriptionFontSize,
-                    color: theme.colorScheme.onSurface.withAlpha(200),
-                  ),
-                  maxLines: isEmphasized ? 3 : 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: iconContainerSize,
+          height: iconContainerSize,
+          decoration: BoxDecoration(
+            color: item.brandColor,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(50),
+                blurRadius: isEmphasized ? 8 : 5,
+                offset: Offset(0, isEmphasized ? 4 : 2),
+              )
             ],
-          );
+          ),
+          child: Center(
+            child: FaIcon(
+              item.icon,
+              size: iconSize,
+              color: item.iconForegroundColor,
+            ),
+          ),
+        ),
+        SizedBox(height: cardPadding * (isEmphasized ? 0.8 : 0.6)),
+        Text(
+          item.text,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: titleFontSize,
+            color: theme.colorScheme.onSurface,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (item.description != null && item.description!.isNotEmpty) ...[
+          SizedBox(height: cardPadding * 0.4),
+          Text(
+            item.description!,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: descriptionFontSize,
+              color: theme.colorScheme.onSurface.withAlpha(200),
+            ),
+            maxLines: isEmphasized ? 3 : 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ],
+    );
 
     return Card(
       child: InkWell(
         onTap: onTap,
         splashColor: item.brandColor.withAlpha(50),
         highlightColor: item.brandColor.withAlpha(30),
+        borderRadius: BorderRadius.circular(16), // Match card shape for ripple
         child: Padding(
           padding: EdgeInsets.all(cardPadding),
           child: isEmphasized && item.isComingSoon
-            ? Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  cardContent,
-                  Positioned(
-                    top: -8,
-                    right: -8,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withAlpha(220),
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(12),
-                          bottomLeft: Radius.circular(8)
+              ? Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    cardContent,
+                    Positioned(
+                      top: -8,
+                      right: -8,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withAlpha(220),
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(12),
+                                bottomLeft: Radius.circular(8)
+                            ),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black.withAlpha(70), blurRadius: 4, offset: Offset(1,1))
+                            ]
                         ),
-                         boxShadow: [
-                           BoxShadow(color: Colors.black.withAlpha(70), blurRadius: 4, offset: Offset(1,1))
-                         ]
-                      ),
-                      child: Text(
-                        "เร็วๆ นี้",
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onPrimary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10 * textScaleFactor.clamp(1.0, 1.1),
+                        child: Text(
+                          "เร็วๆ นี้",
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10 * textScaleFactor.clamp(1.0, 1.1),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              )
-            : cardContent,
+                  ],
+                )
+              : cardContent,
         ),
       ),
     );
